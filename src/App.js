@@ -8,28 +8,79 @@ import {
 import Header from './components/Header';
 import styled from "styled-components";
 import Sidebar from "./components/Sidebar"
+import Chat from './components/Chat';
+import { useAuthState } from "react-firebase-hooks/auth";
+import { auth } from "./firebase";
+import Login from './components/Login';
+import Spinner from "react-spinkit";
 
 function App() {
+  document.title = "Chatter";
+  const [user, loading] = useAuthState(auth);
+  
+  if (loading) {
+    return (
+      <AppLoading>
+        <AppLoadingContents>
+        <img 
+          src="https://i.postimg.cc/fLLPJkNp/
+              93088315c8da46f99b422742cf178317.png"
+              alt="Logo"
+        />
+        <Spinner 
+          name="folding-cube"
+          color= "#115094"
+          fadeIn="none"
+        />
+        </AppLoadingContents>
+      </AppLoading>
+    )
+  }
   return (
     <div className="app">
       <Router>
+        {!user ? (
+          <Login />  
+        ) : (
       <>
       <Header />
       <AppBody>
         <Sidebar />
         <Switch>
           <Route path="/" exact>
-            {/* Chat */}
+            <Chat />
           </Route>
         </Switch>
         </AppBody>
       </>
+      )}
     </Router>
     </div>
   );
 }
 
 export default App;
+
+const AppLoading = styled.div`
+  display: grid;
+  place-items: center;
+  height: 100vh;
+  width: 100%;
+`;
+
+const AppLoadingContents = styled.div`
+  text-align: center;
+  padding-bottom: 100px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  > img {
+    height: 200px;
+    padding: 20px;
+  }
+`;
 
 const AppBody = styled.div`
   display: flex;

@@ -13,16 +13,23 @@ import ExpandLessIcon from "@material-ui/icons/ExpandLess";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import SidebarOption from './SidebarOption';
 import AddIcon from "@material-ui/icons/Add";
+import { useCollection } from "react-firebase-hooks/firestore";
+import { auth, db } from "../firebase";
+import { useAuthState } from 'react-firebase-hooks/auth';
+
 
 function Sidebar() {
+    const [channels] = useCollection(db.collection("rooms"));
+    const [user] = useAuthState(auth);
+    
     return (
         <SidebarContainer>
             <SidebarHeader>
                 <Sidebarinfo>
                     <h2>CHATTER HQ</h2>
                     <h3>
-                        <FiberManualRecordIcon />
-                        Rasel Ahmed
+                    <FiberManualRecordIcon />
+                        {user?.displayName}
                     </h3>
                 </Sidebarinfo>
                 <CreateIcon />
@@ -39,6 +46,10 @@ function Sidebar() {
             <SidebarOption Icon={ExpandMoreIcon} title="Channels" />
             <hr />
             <SidebarOption Icon={AddIcon} addChannelOption title="Add Channel" />
+
+            {channels?.docs.map(doc => (
+                <SidebarOption key={doc.id} id={doc.id} title={doc.data().name} />
+            ))}
         </SidebarContainer>
     );
 }
@@ -52,6 +63,12 @@ const SidebarContainer = styled.div`
     border-top: 1px solid #09386b;
     max-width: 260px;
     margin-top: 60px;
+
+    >hr {
+        margin-top: 10px;
+        margin-bottom: 10px;
+        border: 1px solid #09386b;
+    }
 `;
 
 const SidebarHeader = styled.div`
@@ -65,6 +82,11 @@ const SidebarHeader = styled.div`
         font-size: 18px;
         background-color: white;
         border-radius: 999px;
+        
+        :hover {
+        opacity: 0.9;
+        cursor: pointer;
+        }
     }
 `;
 
